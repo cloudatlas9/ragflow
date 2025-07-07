@@ -161,10 +161,19 @@ RUN --mount=type=cache,id=ragflow_uv,target=/root/.cache/uv,sharing=locked \
         uv sync --python 3.10 --frozen --all-extras; \
     fi
 
+# Copy package.json first to cache npm install
+COPY web/package.json web/package-lock.json web/
+ARG WEB_BUILD_TIMESTAMP
+RUN --mount=type=cache,id=ragflow_npm,target=/root/.npm,sharing=locked \
+    echo "Installing npm dependencies..." && \
+    cd web && npm install
+
+# Copy the rest of web files and build
 COPY web web
 COPY docs docs
 RUN --mount=type=cache,id=ragflow_npm,target=/root/.npm,sharing=locked \
-    cd web && npm install && npm run build
+    echo "Web build timestamp: ${WEB_BUILD_TIMESTAMP}" && \
+    cd web && npm run build
 
 COPY .git /ragflow/.git
 

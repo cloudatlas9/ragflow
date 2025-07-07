@@ -41,7 +41,7 @@ const KnowledgeCard = ({ item }: IProps) => {
   return (
     <Badge.Ribbon
       text={item?.nickname}
-      color={userInfo?.nickname === item?.nickname ? '#1677ff' : 'pink'}
+      color={userInfo?.nickname === item?.nickname ? '#EE0000' : 'pink'}
       className={classNames(styles.ribbon, {
         [styles.hideRibbon]: item.permission !== 'team',
       })}
@@ -97,7 +97,7 @@ const KnowledgeCard = ({ item }: IProps) => {
                   />
                 </Tooltip>
                 <Avatar
-                  style={{ backgroundColor: '#1677ff' }}
+                  style={{ backgroundColor: '#EE0000' }}
                   icon={<AntDesignOutlined />}
                 />
               </Avatar.Group> */}

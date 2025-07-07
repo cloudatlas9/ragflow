@@ -70,6 +70,7 @@ function Root({ children }: React.PropsWithChildren) {
         theme={{
           token: {
             fontFamily: 'Inter',
+            colorPrimary: '#EE0000', // Red primary color for all Ant Design components
           },
           algorithm:
             themeragflow === 'dark'

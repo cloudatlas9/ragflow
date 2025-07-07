@@ -43,17 +43,17 @@
     --colors-background-neutral-standard: white;
     --colors-background-neutral-strong: rgba(226, 223, 246, 1);
     --colors-background-functional-solid-danger: rgba(222, 17, 53, 1);
-    --colors-background-core-strong: rgba(98, 72, 246, 1);
-    --colors-background-sentiment-solid-primary: rgba(127, 105, 255, 1);
-    --colors-background-core-standard: rgb(90, 75, 254);
+    --colors-background-core-strong: rgba(238, 0, 0, 1);
+    --colors-background-sentiment-solid-primary: rgba(238, 0, 0, 1);
+    --colors-background-core-standard: rgb(238, 0, 0);
 
-    --button-blue-text: rgb(22, 119, 255);
+    --button-blue-text: rgb(238, 0, 0);
 
-    --colors-outline-sentiment-primary: rgba(127, 105, 255, 1);
+    --colors-outline-sentiment-primary: rgba(238, 0, 0, 1);
     --colors-outline-neutral-strong: rgba(112, 107, 107, 0.15);
     --colors-outline-neutral-standard: rgba(53, 51, 65, 0.1);
 
-    --colors-text-core-standard: rgba(127, 105, 255, 1);
+    --colors-text-core-standard: rgba(238, 0, 0, 1);
     --colors-text-neutral-strong: rgba(17, 16, 23, 1);
     --colors-text-neutral-standard: rgba(152, 148, 176, 1);
     --colors-text-neutral-weak: rgba(170, 160, 197, 1);
@@ -85,8 +85,8 @@
     --text-title-invert: rgba(255, 255, 255, 1);
     --background-card: rgba(22, 22, 24, 0.05);
 
-    --background-checked: rgba(76, 164, 231, 1);
-    --background-highlight: rgba(76, 164, 231, 0.1);
+    --background-checked: rgba(238, 0, 0, 1);
+    --background-highlight: rgba(238, 0, 0, 0.1);
 
     --input-border: rgba(22, 22, 24, 0.2);
     --dot-green: rgba(59, 160, 92, 1);
@@ -131,21 +131,21 @@
     --background-inverse-weak: rgba(184, 181, 203, 0.15);
     --background-inverse-weak-foreground: rgba(255, 255, 255, 1);
 
-    --background-core-standard: rgba(137, 126, 255, 1);
+    --background-core-standard: rgba(238, 0, 0, 1);
     --background-core-standard-foreground: rgba(255, 255, 255, 1);
 
     --background-inverse-strong: rgba(255, 255, 255, 0.15);
     --background-inverse-strong-foreground: rgba(255, 255, 255, 1);
 
-    --background-core-weak: rgb(101, 75, 248);
+    --background-core-weak: rgb(200, 0, 0);
     --background-core-weak-foreground: rgba(255, 255, 255, 1);
 
     --background-badge: rgba(22, 22, 24, 0.5);
     --text-badge: rgba(151, 154, 171, 1);
 
-    --colors-background-core-standard: rgba(137, 126, 255, 1);
-    --colors-background-core-strong: rgba(152, 147, 255, 1);
-    --colors-background-core-weak: rgba(101, 75, 248, 1);
+    --colors-background-core-standard: rgba(238, 0, 0, 1);
+    --colors-background-core-strong: rgba(238, 0, 0, 1);
+    --colors-background-core-weak: rgba(200, 0, 0, 1);
     --colors-background-functional-solid-danger: rgba(255, 57, 92, 1);
     --colors-background-functional-solid-notice: rgba(255, 208, 94, 1);
     --colors-background-functional-solid-positive: rgba(74, 225, 145, 1);
@@ -163,13 +163,13 @@
     --colors-background-neutral-standard: rgba(11, 10, 18, 1);
     --colors-background-neutral-strong: rgba(29, 26, 44, 1);
     --colors-background-neutral-weak: rgba(17, 16, 23, 1);
-    --colors-background-sentiment-solid-primary: rgba(146, 118, 255, 1);
+    --colors-background-sentiment-solid-primary: rgba(238, 0, 0, 1);
 
-    --colors-outline-sentiment-primary: rgba(146, 118, 255, 1);
+    --colors-outline-sentiment-primary: rgba(238, 0, 0, 1);
     --colors-outline-neutral-strong: rgba(255, 255, 255, 0.15);
     --colors-outline-neutral-standard: rgba(230, 227, 246, 0.1);
 
-    --colors-text-core-standard: rgba(137, 126, 255, 1);
+    --colors-text-core-standard: rgba(238, 0, 0, 1);
     --colors-text-neutral-strong: rgba(255, 255, 255, 1);
     --colors-text-neutral-standard: rgba(230, 227, 246, 1);
     --colors-text-neutral-weak: rgba(170, 160, 197, 1);
@@ -196,9 +196,9 @@
     --text-title-invert: rgba(22, 22, 24, 1);
 
     --background-card: rgba(255, 255, 255, 0.05);
-    --background-checked: rgba(76, 164, 231, 1);
+    --background-checked: rgba(238, 0, 0, 1);
 
-    --background-highlight: rgba(76, 164, 231, 0.1);
+    --background-highlight: rgba(238, 0, 0, 0.1);
 
     --input-border: rgba(255, 255, 255, 0.2);
 
