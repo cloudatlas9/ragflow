@@ -1,13 +1,28 @@
 @import '../../theme/vars';
 
+// Sparkasse font definitions
+@font-face {
+  font-family: 'Sparkasse Head Bold';
+  src: url('../../assets/sparkasse/SparBd.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Sparkasse Regular';
+  src: url('../../assets/sparkasse/SparRg.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
 .loginPage {
   display: flex;
   background-color: rgba(255, 255, 255, 0.1);
 
   .loginLeft {
     // width: 610px;
-    width: 40%;
-    background-color: rgba(255, 255, 255, 0.1);
+    width: 50%;
+    background-color: #f7f7f7; // super light gray
     height: 100vh;
     display: flex;
     align-items: center;
@@ -52,54 +67,48 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 1;
+    width: 50%;
     position: relative;
-    &::before {
-      content: ' ';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background-color: rgba(24, 73, 169, 0.6);
-      background-image: url('@/assets/svg/login-background.svg');
-      background-size: cover;
-      background-blend-mode: multiply;
-      filter: blur(3px);
-      background-position: center;
-      z-index: -1;
-    }
-    .white {
-    }
-    .pink {
-      color: #e9d7fe;
-    }
+    background-color: #fefefe; // broken white background
+
     .rightPanel {
       max-width: 670px;
-      .loginTitle {
-        font-size: 68px;
-        font-style: normal;
-        font-weight: 600;
-        line-height: 90px;
-        letter-spacing: -1.44px;
-      }
-      .loginDescription {
-        font-size: 20px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 30px;
-      }
-      .loginRateNumber {
-        font-size: 16px;
-        font-style: normal;
-        font-weight: 600;
-        line-height: 24px;
-      }
-      .loginRateReviews {
-        font-size: 16px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 24px;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .customRightPanel {
+        text-align: center;
+        padding: 40px;
+
+        .logo {
+          width: 120px;
+          height: auto;
+          margin-bottom: 20px;
+        }
+
+        .welcomeTitle {
+          color: #ee0000 !important; // red text
+          font-family: 'Sparkasse Head Bold', 'SparBd', serif !important;
+          font-size: 48px !important;
+          font-weight: 700 !important;
+          line-height: 1.2 !important;
+          margin-bottom: 24px !important;
+          text-align: center;
+        }
+
+        .welcomeDescription {
+          color: #666666 !important; // gray text
+          font-family: 'Sparkasse Regular', 'SparRg', serif !important;
+          font-size: 18px !important;
+          font-weight: 400 !important;
+          line-height: 1.4 !important;
+          text-align: center;
+          max-width: 500px;
+          margin: 0 auto;
+        }
       }
     }
   }

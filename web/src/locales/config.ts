@@ -64,7 +64,7 @@ i18n
     },
     supportedLngs: Object.values(LanguageAbbreviation),
     resources,
-    fallbackLng: 'en',
+    fallbackLng: 'de', // Changed from 'en' to 'de' for German default
     interpolation: {
       escapeValue: false,
     },

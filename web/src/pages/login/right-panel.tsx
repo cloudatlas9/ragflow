@@ -1,44 +1,26 @@
-import { ReactComponent as Avatars } from '@/assets/svg/login-avatars.svg';
-import SvgIcon from '@/components/svg-icon';
-import { Flex, Rate, Space, Typography } from 'antd';
-import classNames from 'classnames';
-
-import { useTranslate } from '@/hooks/common-hooks';
+import { Flex, Typography } from 'antd';
 import styles from './index.less';
 
 const { Title, Text } = Typography;
 
 const LoginRightPanel = () => {
-  const { t } = useTranslate('login');
   return (
     <section className={styles.rightPanel}>
-      <SvgIcon name="login-star" width={80}></SvgIcon>
-      <Flex vertical gap={40}>
-        <Title
-          level={1}
-          className={classNames(styles.white, styles.loginTitle)}
-        >
-          {t('title')}
+      <Flex
+        vertical
+        align="center"
+        justify="center"
+        gap={32}
+        className={styles.customRightPanel}
+      >
+        <img src="/logo.svg" alt="Logo" className={styles.logo} />
+        <Title level={1} className={styles.welcomeTitle}>
+          Willkommen zum Quick Responder
         </Title>
-        <Text className={classNames(styles.pink, styles.loginDescription)}>
-          {t('description')}
+        <Text className={styles.welcomeDescription}>
+          Ihr intelligenter Assistent für schnelle und präzise Antworten auf
+          alle Ihre Fragen.
         </Text>
-        <Flex align="center" gap={16}>
-          <Avatars></Avatars>
-          <Flex vertical>
-            <Space>
-              <Rate disabled defaultValue={5} />
-              <span
-                className={classNames(styles.white, styles.loginRateNumber)}
-              >
-                5.0
-              </span>
-            </Space>
-            <span className={classNames(styles.pink, styles.loginRateReviews)}>
-              {t('review')}
-            </span>
-          </Flex>
-        </Flex>
       </Flex>
     </section>
   );
