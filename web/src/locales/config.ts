@@ -1,5 +1,4 @@
 import i18n from 'i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
 import { LanguageAbbreviation } from '@/constants/common';
@@ -55,19 +54,14 @@ export const translationTable = createTranslationTable(
     'Deutsch',
   ],
 );
-i18n
-  .use(initReactI18next)
-  .use(LanguageDetector)
-  .init({
-    detection: {
-      lookupLocalStorage: 'lng',
-    },
-    supportedLngs: Object.values(LanguageAbbreviation),
-    resources,
-    fallbackLng: 'de', // Changed from 'en' to 'de' for German default
-    interpolation: {
-      escapeValue: false,
-    },
-  });
+i18n.use(initReactI18next).init({
+  lng: 'de', // Set initial language to German
+  supportedLngs: Object.values(LanguageAbbreviation),
+  resources,
+  fallbackLng: 'de', // Fallback to German if language not found
+  interpolation: {
+    escapeValue: false,
+  },
+});
 
 export default i18n;

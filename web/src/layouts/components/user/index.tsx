@@ -1,4 +1,5 @@
 import { useFetchUserInfo } from '@/hooks/user-setting-hooks';
+import { UserOutlined } from '@ant-design/icons';
 import { Avatar } from 'antd';
 import React from 'react';
 import { history } from 'umi';
@@ -17,10 +18,12 @@ const App: React.FC = () => {
       size={32}
       onClick={toSetting}
       className={styles.clickAvailable}
-      src={
-        userInfo.avatar ??
-        'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
-      }
+      src={userInfo.avatar || undefined} // Show user avatar if available
+      style={{
+        backgroundColor: '#d9d9d9', // Gray background (for fallback)
+        color: '#666666', // Darker gray for icon (for fallback)
+      }}
+      icon={!userInfo.avatar ? <UserOutlined /> : undefined} // Show icon only when no avatar
     />
   );
 };
