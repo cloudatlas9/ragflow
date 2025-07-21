@@ -13,6 +13,7 @@ export enum Routes {
   Chat = '/next-chat',
   Files = '/files',
   ProfileSetting = '/profile-setting',
+  Feedback = '/feedback',
   DatasetTesting = '/testing',
   DatasetSetting = '/setting',
   Chunk = '/chunk',
@@ -126,6 +127,10 @@ const routes = [
       {
         path: '/file',
         component: '@/pages/file-manager',
+      },
+      {
+        path: '/feedback',
+        component: '@/pages/feedback',
       },
       {
         path: '/flow',

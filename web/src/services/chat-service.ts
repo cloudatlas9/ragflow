@@ -23,6 +23,7 @@ const {
   uploadAndParseExternal,
   deleteMessage,
   thumbup,
+  listFeedback,
   tts,
   ask,
   mindmap,
@@ -109,6 +110,10 @@ const methods = {
   thumbup: {
     url: thumbup,
     method: 'post',
+  },
+  listFeedback: {
+    url: listFeedback,
+    method: 'get',
   },
   tts: {
     url: tts,

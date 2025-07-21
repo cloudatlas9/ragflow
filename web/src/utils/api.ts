@@ -92,6 +92,7 @@ export default {
   completeConversation: `${api_host}/conversation/completion`,
   deleteMessage: `${api_host}/conversation/delete_msg`,
   thumbup: `${api_host}/conversation/thumbup`,
+  listFeedback: `${api_host}/conversation/feedback/list`,
   tts: `${api_host}/conversation/tts`,
   ask: `${api_host}/conversation/ask`,
   mindmap: `${api_host}/conversation/mindmap`,
