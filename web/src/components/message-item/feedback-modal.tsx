@@ -8,18 +8,23 @@ type FieldType = {
   feedback?: string;
 };
 
+interface FeedbackModalProps extends IModalProps<IFeedbackRequestBody> {
+  thumbup: boolean;
+}
+
 const FeedbackModal = ({
   visible,
   hideModal,
   onOk,
   loading,
-}: IModalProps<IFeedbackRequestBody>) => {
+  thumbup,
+}: FeedbackModalProps) => {
   const [form] = Form.useForm();
 
   const handleOk = useCallback(async () => {
     const ret = await form.validateFields();
-    return onOk?.({ thumbup: false, feedback: ret.feedback });
-  }, [onOk, form]);
+    return onOk?.({ thumbup, feedback: ret.feedback });
+  }, [onOk, form, thumbup]);
 
   return (
     <Modal
@@ -37,11 +42,11 @@ const FeedbackModal = ({
         autoComplete="off"
         form={form}
       >
-        <Form.Item<FieldType>
-          name="feedback"
-          rules={[{ required: true, message: 'Please input your feedback!' }]}
-        >
-          <Input.TextArea rows={8} placeholder="Please input your feedback!" />
+        <Form.Item<FieldType> name="feedback" rules={[]}>
+          <Input.TextArea
+            rows={8}
+            placeholder="Please input your feedback (optional)"
+          />
         </Form.Item>
       </Form>
     </Modal>

@@ -380,14 +380,11 @@ def thumbup():
             req["message_id"] == msg.get("id", "")
             and msg.get("role", "") == "assistant"
         ):
-            if up_down:
-                msg["thumbup"] = True
-                if "feedback" in msg:
-                    del msg["feedback"]
-            else:
-                msg["thumbup"] = False
-                if feedback:
-                    msg["feedback"] = feedback
+            msg["thumbup"] = up_down
+            if feedback:
+                msg["feedback"] = feedback
+            elif "feedback" in msg and not feedback:
+                del msg["feedback"]
             break
 
     ConversationService.update_by_id(conv["id"], conv)
@@ -417,59 +414,65 @@ def list_feedback():
         from api.db.db_models import Conversation, API4Conversation
 
         feedback_items = []
+        import logging
+
+        # Get all dialogs owned by user's tenants
+        dialogs = DialogService.query(tenant_id=tenant_id, status="1")
+        dialog_ids = [dialog.id for dialog in dialogs]
 
         # Get regular conversations with potential feedback
-        conversations = ConversationService.query(tenant_id=tenant_id)
+        conversations = []
+        for dialog_id in dialog_ids:
+            dialog_conversations = ConversationService.query(dialog_id=dialog_id)
+            conversations.extend(dialog_conversations)
+
         for conv in conversations:
             if not conv.message:
                 continue
-            for msg in conv.message:
-                if msg.get("role") == "assistant" and (
-                    msg.get("thumbup") is not None or msg.get("feedback")
-                ):
-                    # Find the corresponding user message for context
-                    user_msg = None
-                    for i, m in enumerate(conv.message):
-                        if m.get("id") == msg.get("id"):
-                            # Look for the user message before this assistant message
-                            if i > 0 and conv.message[i - 1].get("role") == "user":
-                                user_msg = conv.message[i - 1]
-                            break
 
-                    feedback_items.append(
-                        {
-                            "conversation_id": conv.id,
-                            "conversation_name": conv.name or "Untitled",
-                            "message_id": msg.get("id"),
-                            "user_question": (
-                                user_msg.get("content", "") if user_msg else ""
-                            ),
-                            "assistant_content": msg.get("content", ""),
-                            "thumbup": msg.get("thumbup"),
-                            "feedback": msg.get("feedback", ""),
-                            "timestamp": conv.create_time,
-                            "conversation_type": "regular",
-                            "dialog_id": getattr(conv, "dialog_id", None),
-                        }
-                    )
+            for i, msg in enumerate(conv.message):
+                if msg.get("role") == "assistant" and msg.get("thumbup") is not None:
+                    # Since messages are in strict user→assistant pattern,
+                    # just grab the previous message if it exists and is a user message
+                    user_msg = None
+                    if i > 0 and conv.message[i - 1].get("role") == "user":
+                        user_msg = conv.message[i - 1]
+
+                    feedback_item = {
+                        "conversation_id": conv.id,
+                        "conversation_name": conv.name or "Untitled",
+                        "message_id": msg.get("id"),
+                        "user_question": (
+                            user_msg.get("content", "") if user_msg else ""
+                        ),
+                        "assistant_content": msg.get("content", ""),
+                        "thumbup": msg.get("thumbup"),
+                        "feedback": msg.get("feedback", ""),
+                        "timestamp": conv.create_time,
+                        "conversation_type": "regular",
+                        "dialog_id": getattr(conv, "dialog_id", None),
+                    }
+
+                    feedback_items.append(feedback_item)
 
         # Get API conversations with potential feedback
-        api_conversations = API4ConversationService.query(tenant_id=tenant_id)
+        api_conversations = []
+        for dialog_id in dialog_ids:
+            dialog_api_conversations = API4ConversationService.query(
+                dialog_id=dialog_id
+            )
+            api_conversations.extend(dialog_api_conversations)
+
         for conv in api_conversations:
             if not conv.message:
                 continue
-            for msg in conv.message:
-                if msg.get("role") == "assistant" and (
-                    msg.get("thumbup") is not None or msg.get("feedback")
-                ):
-                    # Find the corresponding user message for context
+            for i, msg in enumerate(conv.message):
+                if msg.get("role") == "assistant" and msg.get("thumbup") is not None:
+                    # Since messages are in strict user→assistant pattern,
+                    # just grab the previous message if it exists and is a user message
                     user_msg = None
-                    for i, m in enumerate(conv.message):
-                        if m.get("id") == msg.get("id"):
-                            # Look for the user message before this assistant message
-                            if i > 0 and conv.message[i - 1].get("role") == "user":
-                                user_msg = conv.message[i - 1]
-                            break
+                    if i > 0 and conv.message[i - 1].get("role") == "user":
+                        user_msg = conv.message[i - 1]
 
                     feedback_items.append(
                         {
@@ -515,14 +518,34 @@ def list_feedback():
         end_idx = start_idx + page_size
         paginated_items = feedback_items[start_idx:end_idx]
 
-        return get_json_result(
-            data={
-                "total": total_count,
-                "page": page,
-                "page_size": page_size,
-                "items": paginated_items,
-            }
+        result = {
+            "total": total_count,
+            "page": page,
+            "page_size": page_size,
+            "items": paginated_items,
+        }
+
+        # Detailed summary log
+        thumbs_up_count = len(
+            [item for item in feedback_items if item["thumbup"] is True]
         )
+        thumbs_down_count = len(
+            [item for item in feedback_items if item["thumbup"] is False]
+        )
+        regular_conv_count = len(
+            [item for item in feedback_items if item["conversation_type"] == "regular"]
+        )
+        api_conv_count = len(
+            [item for item in feedback_items if item["conversation_type"] == "api"]
+        )
+
+        logging.info(
+            f"[FEEDBACK] Query: page={page}, page_size={page_size}, keywords='{keywords}', thumbup_filter={thumbup_filter} | "
+            f"Found: {thumbs_up_count} thumbs up, {thumbs_down_count} thumbs down from {regular_conv_count} regular + {api_conv_count} API conversations | "
+            f"Returning {len(paginated_items)}/{total_count} items after filters/pagination"
+        )
+
+        return get_json_result(data=result)
 
     except Exception as e:
         return server_error_response(e)

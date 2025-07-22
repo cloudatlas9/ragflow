@@ -13,7 +13,7 @@ import {
 } from '@ant-design/icons';
 import { Radio, Tooltip } from 'antd';
 import { NotebookText } from 'lucide-react';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group';
 import FeedbackModal from './feedback-modal';
@@ -44,12 +44,19 @@ export const AssistantGroupButton = ({
     hideModal: hidePromptModal,
     showModal: showPromptModal,
   } = useSetModalState();
+  const [feedbackThumbup, setFeedbackThumbup] = useState<boolean>(false);
   const { t } = useTranslation();
   const { handleRead, ref, isPlaying } = useSpeech(content, audioBinary);
 
   const handleLike = useCallback(() => {
-    onFeedbackOk({ thumbup: true });
-  }, [onFeedbackOk]);
+    setFeedbackThumbup(true);
+    showModal();
+  }, [showModal]);
+
+  const handleDislike = useCallback(() => {
+    setFeedbackThumbup(false);
+    showModal();
+  }, [showModal]);
 
   const { showLogSheet } = useContext(AgentChatContext);
 
@@ -81,7 +88,7 @@ export const AssistantGroupButton = ({
             <ToggleGroupItem value="c" onClick={handleLike}>
               <LikeOutlined />
             </ToggleGroupItem>
-            <ToggleGroupItem value="d" onClick={showModal}>
+            <ToggleGroupItem value="d" onClick={handleDislike}>
               <DislikeOutlined />
             </ToggleGroupItem>
           </>
@@ -101,64 +108,7 @@ export const AssistantGroupButton = ({
           hideModal={hideModal}
           onOk={onFeedbackOk}
           loading={loading}
-        ></FeedbackModal>
-      )}
-      {promptVisible && (
-        <PromptModal
-          visible={promptVisible}
-          hideModal={hidePromptModal}
-          prompt={prompt}
-        ></PromptModal>
-      )}
-    </>
-  );
-
-  return (
-    <>
-      <Radio.Group size="small">
-        <Radio.Button value="a">
-          <CopyToClipboard text={content}></CopyToClipboard>
-        </Radio.Button>
-        {showLoudspeaker && (
-          <Radio.Button value="b" onClick={handleRead}>
-            <Tooltip title={t('chat.read')}>
-              {isPlaying ? <PauseCircleOutlined /> : <SoundOutlined />}
-            </Tooltip>
-            <audio src="" ref={ref}></audio>
-          </Radio.Button>
-        )}
-        {showLikeButton && (
-          <>
-            <Radio.Button value="c" onClick={handleLike}>
-              <LikeOutlined />
-            </Radio.Button>
-            <Radio.Button value="d" onClick={showModal}>
-              <DislikeOutlined />
-            </Radio.Button>
-          </>
-        )}
-        {prompt && (
-          <Radio.Button value="e" onClick={showPromptModal}>
-            <PromptIcon style={{ fontSize: '16px' }} />
-          </Radio.Button>
-        )}
-        <Radio.Button
-          value="f"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleShowLogSheet();
-          }}
-        >
-          <NotebookText className="size-4" />
-        </Radio.Button>
-      </Radio.Group>
-      {visible && (
-        <FeedbackModal
-          visible={visible}
-          hideModal={hideModal}
-          onOk={onFeedbackOk}
-          loading={loading}
+          thumbup={feedbackThumbup}
         ></FeedbackModal>
       )}
       {promptVisible && (

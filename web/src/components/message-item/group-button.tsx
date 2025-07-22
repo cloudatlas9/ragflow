@@ -11,7 +11,7 @@ import {
   SyncOutlined,
 } from '@ant-design/icons';
 import { Radio, Tooltip } from 'antd';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import FeedbackModal from './feedback-modal';
 import { useRemoveMessage, useSendFeedback, useSpeech } from './hooks';
@@ -41,12 +41,19 @@ export const AssistantGroupButton = ({
     hideModal: hidePromptModal,
     showModal: showPromptModal,
   } = useSetModalState();
+  const [feedbackThumbup, setFeedbackThumbup] = useState<boolean>(false);
   const { t } = useTranslation();
   const { handleRead, ref, isPlaying } = useSpeech(content, audioBinary);
 
   const handleLike = useCallback(() => {
-    onFeedbackOk({ thumbup: true });
-  }, [onFeedbackOk]);
+    setFeedbackThumbup(true);
+    showModal();
+  }, [showModal]);
+
+  const handleDislike = useCallback(() => {
+    setFeedbackThumbup(false);
+    showModal();
+  }, [showModal]);
 
   return (
     <>
@@ -67,7 +74,7 @@ export const AssistantGroupButton = ({
             <Radio.Button value="c" onClick={handleLike}>
               <LikeOutlined />
             </Radio.Button>
-            <Radio.Button value="d" onClick={showModal}>
+            <Radio.Button value="d" onClick={handleDislike}>
               <DislikeOutlined />
             </Radio.Button>
           </>
@@ -84,6 +91,7 @@ export const AssistantGroupButton = ({
           hideModal={hideModal}
           onOk={onFeedbackOk}
           loading={loading}
+          thumbup={feedbackThumbup}
         ></FeedbackModal>
       )}
       {promptVisible && (

@@ -1,4 +1,5 @@
 import { PageHeader } from '@/components/page-header';
+import { useFetchUserInfo } from '@/hooks/user-setting-hooks';
 import chatService from '@/services/chat-service';
 import {
   DislikeOutlined,
@@ -7,7 +8,6 @@ import {
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Badge,
   Button,
   Card,
   Input,
@@ -21,7 +21,7 @@ import {
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { MessageSquareText } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'umi';
 
 const { Text, Paragraph } = Typography;
@@ -50,12 +50,39 @@ interface FeedbackResponse {
 
 export default function FeedbackPage() {
   const navigate = useNavigate();
+  const { data: userInfo } = useFetchUserInfo();
 
   // State for filters and pagination
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [keywords, setKeywords] = useState('');
   const [thumbupFilter, setThumbupFilter] = useState<string | null>(null);
+
+  // Format date according to user's language
+  const formatDate = useCallback(
+    (timestamp: number) => {
+      const date = new Date(timestamp);
+      const language = userInfo?.language || 'English';
+
+      // Map language names to locale codes
+      const localeMap: { [key: string]: string } = {
+        German: 'de-DE',
+        English: 'en-US',
+        Chinese: 'zh-CN',
+        Spanish: 'es-ES',
+        French: 'fr-FR',
+        Japanese: 'ja-JP',
+        Korean: 'ko-KR',
+        Vietnamese: 'vi-VN',
+        'Portuguese BR': 'pt-BR',
+        'Traditional Chinese': 'zh-TW',
+      };
+
+      const locale = localeMap[language] || 'en-US';
+      return date.toLocaleDateString(locale);
+    },
+    [userInfo?.language],
+  );
 
   // Fetch feedback data
   const {
@@ -80,14 +107,15 @@ export default function FeedbackPage() {
       }
 
       const response = await chatService.listFeedback(params);
-      console.log('Feedback API Response:', response); // Debug log
+      // console.log('Feedback API Response:', response); // Debug log
 
       // Handle case where response.data might be undefined or malformed
-      if (!response.data) {
+      if (!response.data || !response.data.data) {
         return { total: 0, page: 1, page_size: pageSize, items: [] };
       }
 
-      return response.data;
+      // Return the nested data object that contains items, total, etc.
+      return response.data.data;
     },
     refetchOnWindowFocus: false,
   });
@@ -95,9 +123,9 @@ export default function FeedbackPage() {
   // Handle navigation to conversation
   const handleViewConversation = (record: FeedbackItem) => {
     if (record.conversation_type === 'regular') {
-      // Navigate to regular chat conversation
+      // Navigate to regular chat conversation with correct URL format
       navigate(
-        `/chat?conversation_id=${record.conversation_id}&dialog_id=${record.dialog_id}`,
+        `/chat?dialogId=${record.dialog_id}&conversationId=${record.conversation_id}&isNew=`,
       );
     } else {
       // For API conversations, we might not have a direct view, show a message
@@ -209,9 +237,7 @@ export default function FeedbackPage() {
         dataIndex: 'timestamp',
         key: 'timestamp',
         width: 120,
-        render: (timestamp: number) => (
-          <Text>{new Date(timestamp * 1000).toLocaleDateString()}</Text>
-        ),
+        render: (timestamp: number) => <Text>{formatDate(timestamp)}</Text>,
         sorter: true,
         sortDirections: ['descend', 'ascend'],
       },
@@ -234,7 +260,7 @@ export default function FeedbackPage() {
         ),
       },
     ],
-    [thumbupFilter, navigate],
+    [thumbupFilter, navigate, formatDate],
   );
 
   // Handle search
@@ -294,29 +320,68 @@ export default function FeedbackPage() {
           {/* Summary Stats */}
           <div style={{ marginBottom: 24 }}>
             <Space size={24}>
-              <Badge count={feedbackData?.total || 0} showZero color="blue">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <Text strong>Total Feedback</Text>
-              </Badge>
-              <Badge
-                count={
-                  feedbackData?.items?.filter((item) => item.thumbup === true)
-                    .length || 0
-                }
-                showZero
-                color="green"
-              >
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minWidth: 24,
+                    height: 24,
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(24, 144, 255, 0.1)',
+                    color: '#1890ff',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    padding: '0 6px',
+                  }}
+                >
+                  {feedbackData?.total || 0}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <Text strong>Positive</Text>
-              </Badge>
-              <Badge
-                count={
-                  feedbackData?.items?.filter((item) => item.thumbup === false)
-                    .length || 0
-                }
-                showZero
-                color="red"
-              >
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minWidth: 24,
+                    height: 24,
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(24, 144, 255, 0.1)',
+                    color: '#1890ff',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    padding: '0 6px',
+                  }}
+                >
+                  {feedbackData?.items?.filter((item) => item.thumbup === true)
+                    .length || 0}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <Text strong>Negative</Text>
-              </Badge>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minWidth: 24,
+                    height: 24,
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(24, 144, 255, 0.1)',
+                    color: '#1890ff',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    padding: '0 6px',
+                  }}
+                >
+                  {feedbackData?.items?.filter((item) => item.thumbup === false)
+                    .length || 0}
+                </span>
+              </div>
             </Space>
           </div>
 
