@@ -109,7 +109,7 @@ def register_page(page_path):
 
     page_name = page_path.stem.removesuffix("_app")
     module_name = ".".join(
-        page_path.parts[page_path.parts.index("api"): -1] + (page_name,)
+        page_path.parts[page_path.parts.index("api") : -1] + (page_name,)
     )
 
     spec = spec_from_file_location(module_name, page_path)
@@ -138,6 +138,11 @@ client_urls_prefix = [
     register_page(path) for dir in pages_dir for path in search_pages_path(dir)
 ]
 
+# Register health check endpoints for Kubernetes
+from api.apps.health import health_bp
+
+app.register_blueprint(health_bp)
+
 
 @login_manager.request_loader
 def load_user(web_request):
@@ -146,22 +151,26 @@ def load_user(web_request):
     if authorization:
         try:
             access_token = str(jwt.loads(authorization))
-            
+
             if not access_token or not access_token.strip():
                 logging.warning("Authentication attempt with empty access token")
                 return None
-            
+
             # Access tokens should be UUIDs (32 hex characters)
             if len(access_token.strip()) < 32:
-                logging.warning(f"Authentication attempt with invalid token format: {len(access_token)} chars")
+                logging.warning(
+                    f"Authentication attempt with invalid token format: {len(access_token)} chars"
+                )
                 return None
-            
+
             user = UserService.query(
                 access_token=access_token, status=StatusEnum.VALID.value
             )
             if user:
                 if not user[0].access_token or not user[0].access_token.strip():
-                    logging.warning(f"User {user[0].email} has empty access_token in database")
+                    logging.warning(
+                        f"User {user[0].email} has empty access_token in database"
+                    )
                     return None
                 return user[0]
             else:

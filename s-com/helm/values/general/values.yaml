@@ -1,0 +1,37 @@
+template: node
+
+networkPolicy:
+  ingress:
+    - monitoring
+
+resources:
+  limits:
+    cpu: 2.000
+    memory: 4Gi
+  requests:
+    cpu: 1.000
+    memory: 2Gi
+
+replicaCount: 1
+
+probes:
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 60
+    path: /internal/liveness
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 90
+    path: /internal/readiness
+
+integration:
+  prometheus:
+    enabled: true
+    port: 9380
+
+cronjobs: # Remove this block if you don't need a cronjob
+  - name: confluence-sync
+    enabled: false # Set to true if you want to enable the cronjob
+    image: curlimages/curl
+    schedule: "0 6 * * *" # Daily at 6 AM
+    command: "curl --data '' http://ragflow-core-service/internal/sync" # Replace with actual sync endpoint

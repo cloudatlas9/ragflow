@@ -1,0 +1,24 @@
+services:
+  ragflow-core: # Use GitLab project name pattern
+    image: ragflow-core:${DOCKER_IMAGE_TAG:-latest}
+    build:
+      dockerfile: s-com/Dockerfile
+      context: .
+    environment:
+      VIRTUAL_HOST: ${VIRTUAL_HOST:-ragflow.local}
+      VIRTUAL_PORT: ${VIRTUAL_PORT:-9380}
+      CERT_NAME: default
+      # RAGFlow-specific environment variables for external services
+      DOC_ENGINE: infinity
+      MYSQL_HOST: mariadb-service
+      MYSQL_DBNAME: rag_flow
+      MYSQL_USER: ragflow_user
+      REDIS_HOST: redis-service
+      MINIO_HOST: minio-service
+      MINIO_USER: rag_flow
+      INFINITY_HOST: infinity-service
+      TZ: Europe/Berlin
+      # Default passwords (will be overridden by Kubernetes secrets in production)
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-infini_rag_flow}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-infini_rag_flow}
+      MINIO_PASSWORD: ${MINIO_PASSWORD:-infini_rag_flow}

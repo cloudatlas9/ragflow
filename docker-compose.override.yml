@@ -1,0 +1,31 @@
+services:
+  ragflow-core:
+    build:
+      target: main
+    hostname: ${VIRTUAL_HOST:-ragflow.local}
+    command: "./entrypoint.sh"
+    volumes:
+      - ./api:/ragflow/api
+      - ./rag:/ragflow/rag
+      - ./web:/ragflow/web
+      - ./s-com/service_conf.yaml.template:/ragflow/conf/service_conf.yaml.template
+    environment:
+      # Local development environment
+      DEBUG: 1
+      # Point to local external services for development
+      MYSQL_HOST: "mariadb-dev"
+      MYSQL_PORT: "3306"
+      MYSQL_USERNAME: "root"
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD:-secret}
+      MYSQL_DATABASE: "ragflow_dev"
+      REDIS_HOST: "redis-dev"
+      REDIS_PORT: "6379"
+      MINIO_HOST: "minio-dev"
+      MINIO_PORT: "9000"
+      INFINITY_HOST: "infinity-dev"
+      INFINITY_PORT: "23817"
+
+networks:
+  default:
+    name: nginx-proxy
+    external: true

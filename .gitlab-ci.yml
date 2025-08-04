@@ -1,0 +1,31 @@
+variables:
+  HELM_CHART_VERSION: "5.0.0" # Use current version https://wiki.s-communication.de/display/EuB/HELM3+SFP-General
+  NAMESPACE: lioness # Use lioness namespace
+  # SLACK_CHANNEL: "gitlabci_portals" # Uncomment when Slack notifications should be send for GitLab pipelines
+
+include:
+  project: infrastructure/gitlab/gitlab-ci-includes
+  ref: main
+  file: /templates/default-ci-cd-pipeline-for-dockerized-apps.gitlab-ci.yml
+
+configuration-check:
+  stage: prebuild
+  interruptible: true
+  script:
+    - |-
+      if [ "x${RUN_REPLACE_CHECK}" != "xfalse" ]
+      then
+        if test $(find . -type f  -not -name "README.md" -exec grep -Hn "PROJECT_SETUP:" {} \; | wc -l) -eq 0
+        then
+          exit 0
+        else
+          echo "Please replace all occurences of \"PROJECT_SETUP:\"."
+          exit 1
+        fi
+      fi
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+
+app-test:
+  extends: .test-application-with-docker-compose
