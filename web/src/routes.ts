@@ -29,6 +29,7 @@ export enum Routes {
   ProfileModel = `${ProfileSetting}${Model}`,
   ProfilePrompt = `${ProfileSetting}${Prompt}`,
   ProfileProfile = `${ProfileSetting}${Profile}`,
+  Feedback = '/feedback',
   DatasetTesting = '/testing',
   DatasetSetting = '/setting',
   Chunk = '/chunk',
@@ -243,6 +244,17 @@ const routes = [
       {
         path: Routes.Files,
         component: `@/pages${Routes.Files}`,
+      },
+    ],
+  },
+  {
+    path: Routes.Feedback,
+    layout: false,
+    component: '@/layouts/next',
+    routes: [
+      {
+        path: Routes.Feedback,
+        component: `@/pages${Routes.Feedback}`,
       },
     ],
   },

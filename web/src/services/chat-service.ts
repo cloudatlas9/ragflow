@@ -130,4 +130,9 @@ const methods = {
 
 const chatService = registerServer<keyof typeof methods>(methods, request);
 
+/** List feedback from conversations with pagination and filtering */
+chatService.listFeedback = (params: URLSearchParams) => {
+  return request.get(`/conversation/feedback/list?${params.toString()}`);
+};
+
 export default chatService;

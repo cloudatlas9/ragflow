@@ -27,6 +27,7 @@ import {
   Moon,
   Search,
   Sun,
+  ThumbsUp,
 } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -71,6 +72,7 @@ export function Header() {
       { path: Routes.Searches, name: t('header.search'), icon: Search },
       { path: Routes.Agents, name: t('header.flow'), icon: Cpu },
       { path: Routes.Files, name: t('header.fileManager'), icon: File },
+      { path: Routes.Feedback, name: 'Feedback', icon: ThumbsUp },
     ],
     [t],
   );

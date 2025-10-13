@@ -332,6 +332,137 @@ def thumbup():
     return get_json_result(data=conv)
 
 
+@manager.route("/feedback/list", methods=["GET"])  # noqa: F821
+@login_required
+def list_feedback():
+    """List all feedback from conversations with pagination and filtering."""
+    try:
+        # Get current user's tenant
+        tenants = UserTenantService.query(user_id=current_user.id)
+        if not tenants:
+            return get_data_error_result(message="Tenant not found!")
+
+        tenant_id = tenants[0].tenant_id
+
+        # Get pagination parameters
+        page = int(request.args.get("page", 1))
+        page_size = int(request.args.get("page_size", 20))
+        keywords = request.args.get("keywords", "").strip()
+        thumbup_filter = request.args.get("thumbup")  # "true", "false", or None
+
+        # Query both regular conversations and API conversations
+        from api.db.services.api_service import API4ConversationService
+        from api.db.db_models import Conversation, API4Conversation
+
+        feedback_items = []
+
+        # Get regular conversations with potential feedback
+        conversations = ConversationService.query(tenant_id=tenant_id)
+        for conv in conversations:
+            if not conv.message:
+                continue
+            for msg in conv.message:
+                if msg.get("role") == "assistant" and (
+                    msg.get("thumbup") is not None or msg.get("feedback")
+                ):
+                    # Find the corresponding user message for context
+                    user_msg = None
+                    for i, m in enumerate(conv.message):
+                        if m.get("id") == msg.get("id"):
+                            if i > 0 and conv.message[i - 1].get("role") == "user":
+                                user_msg = conv.message[i - 1]
+                            break
+
+                    feedback_items.append(
+                        {
+                            "conversation_id": conv.id,
+                            "conversation_name": conv.name or "Untitled",
+                            "message_id": msg.get("id"),
+                            "user_question": (
+                                user_msg.get("content", "") if user_msg else ""
+                            ),
+                            "assistant_content": msg.get("content", ""),
+                            "thumbup": msg.get("thumbup"),
+                            "feedback": msg.get("feedback", ""),
+                            "timestamp": conv.create_time,
+                            "conversation_type": "regular",
+                            "dialog_id": getattr(conv, "dialog_id", None),
+                        }
+                    )
+
+        # Get API conversations with potential feedback
+        api_conversations = API4ConversationService.query(tenant_id=tenant_id)
+        for conv in api_conversations:
+            if not conv.message:
+                continue
+            for msg in conv.message:
+                if msg.get("role") == "assistant" and (
+                    msg.get("thumbup") is not None or msg.get("feedback")
+                ):
+                    user_msg = None
+                    for i, m in enumerate(conv.message):
+                        if m.get("id") == msg.get("id"):
+                            if i > 0 and conv.message[i - 1].get("role") == "user":
+                                user_msg = conv.message[i - 1]
+                            break
+
+                    feedback_items.append(
+                        {
+                            "conversation_id": conv.id,
+                            "conversation_name": f"API Conversation {conv.user_id}",
+                            "message_id": msg.get("id"),
+                            "user_question": (
+                                user_msg.get("content", "") if user_msg else ""
+                            ),
+                            "assistant_content": msg.get("content", ""),
+                            "thumbup": msg.get("thumbup"),
+                            "feedback": msg.get("feedback", ""),
+                            "timestamp": conv.create_time,
+                            "conversation_type": "api",
+                            "dialog_id": conv.dialog_id,
+                            "user_id": conv.user_id,
+                        }
+                    )
+
+        # Apply filters
+        if thumbup_filter is not None:
+            thumbup_bool = thumbup_filter.lower() == "true"
+            feedback_items = [
+                item for item in feedback_items if item["thumbup"] == thumbup_bool
+            ]
+
+        if keywords:
+            keywords_lower = keywords.lower()
+            feedback_items = [
+                item
+                for item in feedback_items
+                if keywords_lower in item["user_question"].lower()
+                or keywords_lower in item["assistant_content"].lower()
+                or keywords_lower in item["feedback"].lower()
+            ]
+
+        # Sort by timestamp descending (newest first)
+        feedback_items.sort(key=lambda x: x["timestamp"], reverse=True)
+
+        # Apply pagination
+        total_count = len(feedback_items)
+        start_idx = (page - 1) * page_size
+        end_idx = start_idx + page_size
+        paginated_items = feedback_items[start_idx:end_idx]
+
+        return get_json_result(
+            data={
+                "total": total_count,
+                "page": page,
+                "page_size": page_size,
+                "items": paginated_items,
+            }
+        )
+
+    except Exception as e:
+        return server_error_response(e)
+
+
 @manager.route("/ask", methods=["POST"])  # noqa: F821
 @login_required
 @validate_request("question", "kb_ids")
